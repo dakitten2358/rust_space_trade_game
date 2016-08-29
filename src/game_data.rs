@@ -3,11 +3,15 @@ use std::collections::HashMap;
 
 pub struct GameDataLibrary {
     ships: HashMap<i32, Spaceship>,
+    cargo: HashMap<i32, CargoItem>,
 }
 
 impl GameDataLibrary {
     pub fn new() -> GameDataLibrary {
-        let mut a = GameDataLibrary { ships: HashMap::new() };
+        let mut a = GameDataLibrary {
+            ships: HashMap::new(),
+            cargo: HashMap::new(),
+        };
 
         let default_ship = Spaceship {
             display_name: "Ship".to_string(),
@@ -17,6 +21,11 @@ impl GameDataLibrary {
         };
 
         a.ships.insert(0, default_ship);
+
+        let default_cargo = CargoItem { display_name: "Cargo".to_string() };
+
+        a.cargo.insert(0, default_cargo);
+
         a
     }
 
@@ -24,6 +33,13 @@ impl GameDataLibrary {
         match self.ships.get(&id) {
             Some(ship) => ship,
             None => panic!("Couldn't find ship {}", id),
+        }
+    }
+
+    pub fn get_cargo(&self, id: i32) -> &CargoItem {
+        match self.cargo.get(&id) {
+            Some(c) => c,
+            None => panic!("Couldn't find the cargo {}", id),
         }
     }
 }

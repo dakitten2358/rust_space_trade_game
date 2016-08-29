@@ -26,7 +26,6 @@ impl<'a, 'b> HasCargoSpace for PlayerSpaceship<'a, 'b> {
 fn main() {
 
     let lib = game_data::GameDataLibrary::new();
-    let c = CargoItem { display_name: "test".to_string() };
 
     let mut player_ship = PlayerSpaceship {
         base: lib.get_ship(0),
@@ -34,7 +33,7 @@ fn main() {
         cargo: Vec::new(),
     };
 
-    player_ship.cargo.push(&c);
+    player_ship.cargo.push(lib.get_cargo(0));
 
     loop {
         print_ship_status(&player_ship);
