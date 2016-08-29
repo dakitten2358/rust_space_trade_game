@@ -1,5 +1,8 @@
+mod game_data;
+mod spaceship;
+
+use spaceship::*;
 use std::io;
-extern crate core;
 
 enum PlayerCommand {
     Quit,
@@ -8,30 +11,30 @@ enum PlayerCommand {
     UnknownAction,
 }
 
-struct Spaceship {
-    display_name: String,
-    fuel_capacity: u32,
-    jump_distance: u32,
-    cargo_capacity: u32,
-}
-
-struct PlayerSpaceship<'a> {
+struct PlayerSpaceship<'a, 'b> {
     base: &'a Spaceship,
     current_fuel: u32,
+    cargo: Vec<&'b CargoItem>,
+}
+
+impl<'a, 'b> HasCargoSpace for PlayerSpaceship<'a, 'b> {
+    fn used_cargo_space(&self) -> u32 {
+        self.cargo.iter().fold(0u32, |sum, x| sum + x.used_cargo_space())
+    }
 }
 
 fn main() {
 
-    let default_ship = Spaceship {
-        display_name: "Ship".to_string(),
-        fuel_capacity: 10,
-        jump_distance: 100,
-        cargo_capacity: 10,
-    };
+    let lib = game_data::GameDataLibrary::new();
+    let c = CargoItem { display_name: "test".to_string() };
+
     let mut player_ship = PlayerSpaceship {
-        base: &default_ship,
-        current_fuel: default_ship.fuel_capacity,
+        base: lib.get_ship(0),
+        current_fuel: lib.get_ship(0).fuel_capacity,
+        cargo: Vec::new(),
     };
+
+    player_ship.cargo.push(&c);
 
     loop {
         print_ship_status(&player_ship);
@@ -89,4 +92,8 @@ fn print_ship_status(ship: &PlayerSpaceship) {
              ship.base.display_name,
              ship.current_fuel,
              ship.base.fuel_capacity);
+
+    print!("Your cargo consumes {} of {} spaces",
+           ship.used_cargo_space(),
+           ship.base.cargo_capacity);
 }
