@@ -33,8 +33,6 @@ fn main() {
         current_fuel: default_ship.fuel_capacity,
     };
 
-    println!("{}", player_ship.base.jump_distance);
-
     loop {
         print_ship_status(&player_ship);
 
@@ -69,7 +67,7 @@ fn read_player_input() -> String {
     player_input
 }
 
-fn tokenize_input<'a>(player_input: &'a String) -> Vec<String> {
+fn tokenize_input(player_input: &String) -> Vec<String> {
     player_input.to_lowercase()
         .as_str()
         .split_whitespace()
