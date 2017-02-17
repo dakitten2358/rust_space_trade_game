@@ -1,16 +1,38 @@
 use spaceship::*;
 use std::collections::HashMap;
 
-pub struct GameDataLibrary {
-    ships: HashMap<i32, Spaceship>,
-    cargo: HashMap<i32, CargoItem>,
+pub struct StarSystem<'a> {
+    pub id: i32,
+    pub display_name: String,
+    pub cargo: Vec<CargoInstance<'a>>,
+    pub connected_to: Vec<i32>,
 }
 
-impl GameDataLibrary {
-    pub fn new() -> GameDataLibrary {
+fn connect_star_systems(first_system: &mut StarSystem, second_system: &mut StarSystem) {
+    first_system.connected_to.push(second_system.id);
+    second_system.connected_to.push(first_system.id);
+}
+
+impl<'a> HoldsCargo<'a> for StarSystem<'a> {
+    fn add_cargo(&mut self, cargo_type: &'a CargoItem, count: u32, value: f64) {
+        self.cargo.push(CargoInstance::new(cargo_type, count, value));
+    }
+
+    fn remove_cargo(&mut self, cargo_type: &CargoItem, count: u32) {}
+}
+
+pub struct GameDataLibrary<'a> {
+    ships: HashMap<i32, Spaceship>,
+    cargo: HashMap<i32, CargoItem>,
+    systems: HashMap<i32, StarSystem<'a>>,
+}
+
+impl<'a> GameDataLibrary<'a> {
+    pub fn new() -> GameDataLibrary<'a> {
         let mut a = GameDataLibrary {
             ships: HashMap::new(),
             cargo: HashMap::new(),
+            systems: HashMap::new(),
         };
 
         let default_ship = Spaceship {
@@ -26,6 +48,26 @@ impl GameDataLibrary {
 
         a.cargo.insert(0, default_cargo);
 
+        let mut default_starsystem = StarSystem {
+            id: 0,
+            display_name: "Sol".to_string(),
+            cargo: Vec::new(),
+            connected_to: Vec::new(),
+        };
+
+        let mut second_starsystem = StarSystem {
+            id: 1,
+            display_name: "Alpha Centauri".to_string(),
+            cargo: Vec::new(),
+            connected_to: Vec::new(),
+        };
+
+        connect_star_systems(&mut default_starsystem, &mut second_starsystem);
+
+        let system_id = default_starsystem.id;
+        a.systems.insert(system_id, default_starsystem);
+        let system_id = second_starsystem.id;
+        a.systems.insert(system_id, second_starsystem);
         a
     }
 
@@ -40,6 +82,13 @@ impl GameDataLibrary {
         match self.cargo.get(&id) {
             Some(c) => c,
             None => panic!("Couldn't find the cargo {}", id),
+        }
+    }
+
+    pub fn get_system(&self, id: i32) -> &StarSystem {
+        match self.systems.get(&id) {
+            Some(system) => system,
+            None => panic!("Couldn't find the system {}", id),
         }
     }
 }

@@ -3,6 +3,7 @@ mod spaceship;
 
 use spaceship::*;
 use std::io;
+use game_data::*;
 
 enum PlayerCommand {
     Quit,
@@ -14,12 +15,18 @@ enum PlayerCommand {
 struct PlayerSpaceship<'a, 'b> {
     base: &'a Spaceship,
     current_fuel: u32,
-    cargo: Vec<&'b CargoItem>,
+    cargo: Vec<CargoInstance<'b>>,
 }
 
 impl<'a, 'b> HasCargoSpace for PlayerSpaceship<'a, 'b> {
     fn used_cargo_space(&self) -> u32 {
         self.cargo.iter().fold(0u32, |sum, x| sum + x.used_cargo_space())
+    }
+}
+
+impl<'a, 'b> PlayerSpaceship<'a, 'b> {
+    pub fn add_cargo(&mut self, cargo_type: &'b CargoItem, count: u32, value: f64) {
+        self.cargo.push(CargoInstance::new(cargo_type, count, value));
     }
 }
 
@@ -33,10 +40,13 @@ fn main() {
         cargo: Vec::new(),
     };
 
-    player_ship.cargo.push(lib.get_cargo(0));
+    player_ship.add_cargo(lib.get_cargo(0), 3u32, 1.0f64);
+
+    let mut current_system = lib.get_system(0);
 
     loop {
-        print_ship_status(&player_ship);
+        print_ship_status(&player_ship, &current_system);
+        print_system_info(&lib, &current_system);
 
         // get player input
         let player_text = read_player_input();
@@ -54,7 +64,8 @@ fn main() {
                 println!("ermg! halp!");
             }
             PlayerCommand::JumpToStarSystem { system_id } => {
-                println!("jumping to: {}", system_id);
+                current_system = lib.get_system(system_id);
+                println!("jumping to: {}", current_system.display_name);
             }
             _ => {
                 println!("Unknown command!  Input \"help\" for a list of commands");
@@ -79,20 +90,41 @@ fn tokenize_input(player_input: &String) -> Vec<String> {
 
 fn map_input_tokens_to_command(tokens: &Vec<String>) -> PlayerCommand {
     match tokens[0].as_str() {
+        "q" => PlayerCommand::Quit,
         "quit" => PlayerCommand::Quit,
         "help" => PlayerCommand::Help,
-        "jump" => PlayerCommand::JumpToStarSystem { system_id: 0 },
+        "jump" => {
+            if tokens.len() > 1 {
+                PlayerCommand::JumpToStarSystem { system_id: tokens[1].parse::<i32>().unwrap() }
+            } else {
+                PlayerCommand::UnknownAction
+            }
+        }
         _ => PlayerCommand::UnknownAction,
     }
 }
 
-fn print_ship_status(ship: &PlayerSpaceship) {
+fn print_ship_status(ship: &PlayerSpaceship, system: &StarSystem) {
     println!("You are flying a {}, and your fuel is at {}/{}",
              ship.base.display_name,
              ship.current_fuel,
              ship.base.fuel_capacity);
 
-    print!("Your cargo consumes {} of {} spaces",
-           ship.used_cargo_space(),
-           ship.base.cargo_capacity);
+    println!("Your cargo consumes {} of {} spaces.",
+             ship.used_cargo_space(),
+             ship.base.cargo_capacity);
+}
+
+fn print_system_info(lib: &GameDataLibrary, system: &StarSystem) {
+    println!("You are in the {} system.  From here, you can jump to:",
+             system.display_name);
+
+    let ref connected_to = system.connected_to;
+    for connected_system_id in connected_to {
+        let connected_system = lib.get_system(*connected_system_id);
+
+        println!("\t{}\t{}",
+                 connected_system_id,
+                 connected_system.display_name);
+    }
 }
