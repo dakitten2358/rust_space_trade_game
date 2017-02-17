@@ -15,10 +15,22 @@ fn connect_star_systems(first_system: &mut StarSystem, second_system: &mut StarS
 
 impl<'a> HoldsCargo<'a> for StarSystem<'a> {
     fn add_cargo(&mut self, cargo_type: &'a CargoItem, count: u32, value: f64) {
-        self.cargo.push(CargoInstance::new(cargo_type, count, value));
+        let found_index =
+            self.cargo.iter().position(|ref r| r.cargo.display_name == cargo_type.display_name);
+        match found_index {
+            Some(index) => self.cargo[index].count += count,
+            None => self.cargo.push(CargoInstance::new(cargo_type, count, value)),
+        }
     }
 
-    fn remove_cargo(&mut self, cargo_type: &CargoItem, count: u32) {}
+    fn remove_cargo(&mut self, cargo_type: &CargoItem, count: u32) {
+        let found_index =
+            self.cargo.iter().position(|ref r| r.cargo.display_name == cargo_type.display_name);
+        match found_index {
+            Some(x) => self.cargo[x].count = self.cargo[x].count - count,
+            None => {}
+        }
+    }
 }
 
 pub struct GameDataLibrary<'a> {

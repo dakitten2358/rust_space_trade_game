@@ -45,7 +45,7 @@ fn main() {
     let mut current_system = lib.get_system(0);
 
     loop {
-        print_ship_status(&player_ship, &current_system);
+        print_ship_status(&player_ship);
         print_system_info(&lib, &current_system);
 
         // get player input
@@ -104,7 +104,7 @@ fn map_input_tokens_to_command(tokens: &Vec<String>) -> PlayerCommand {
     }
 }
 
-fn print_ship_status(ship: &PlayerSpaceship, system: &StarSystem) {
+fn print_ship_status(ship: &PlayerSpaceship) {
     println!("You are flying a {}, and your fuel is at {}/{}",
              ship.base.display_name,
              ship.current_fuel,
