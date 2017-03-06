@@ -55,48 +55,7 @@ impl GameDataLibrary {
             cargo: HashMap::new(),
             systems: HashMap::new(),
         };
-        // let default_ship = Spaceship {
-        // display_name: "Ship".to_string(),
-        // fuel_capacity: 10,
-        // jump_distance: 100,
-        // cargo_capacity: 10u32,
-        // };
-        //
-        // a.ships.insert(0, default_ship);
-        //
-        //
-        // a.load_ships_from_json("jason.json");
-        //
-        //
-        // let default_cargo = CargoItem { display_name: "Cargo".to_string() };
-        //
-        // a.cargo.insert(0, default_cargo.clone());
-        //
-        // let mut default_starsystem = StarSystem {
-        // id: 0,
-        // display_name: "Sol".to_string(),
-        // cargo: Vec::new(),
-        // connected_to: Vec::new(),
-        // };
-        //
-        // default_starsystem.add_cargo(&default_cargo, 12, 3.1459);
-        //
-        // let mut second_starsystem = StarSystem {
-        // id: 1,
-        // display_name: "Alpha Centauri".to_string(),
-        // cargo: Vec::new(),
-        // connected_to: Vec::new(),
-        // };
-        //
-        // connect_star_systems(&mut default_starsystem, &mut second_starsystem);
-        //
-        // let system_id = default_starsystem.id;
-        // a.systems.insert(system_id, default_starsystem);
-        // let system_id = second_starsystem.id;
-        // a.systems.insert(system_id, second_starsystem);
-        //
         a
-
     }
 
     pub fn get_ship(&self, id: i32) -> &Spaceship {
