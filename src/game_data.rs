@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use std::io;
 use std::io::prelude::*;
 use std::fs::File;
-use std::io::*;
 use std::*;
 use serde_json;
 
@@ -13,11 +12,6 @@ pub struct StarSystem {
     pub display_name: String,
     pub cargo: Vec<CargoInstance>,
     pub connected_to: Vec<i32>,
-}
-
-fn connect_star_systems(first_system: &mut StarSystem, second_system: &mut StarSystem) {
-    first_system.connected_to.push(second_system.id);
-    second_system.connected_to.push(first_system.id);
 }
 
 impl HoldsCargo for StarSystem {
@@ -50,7 +44,7 @@ pub struct GameDataLibrary {
 impl GameDataLibrary {
     pub fn new() -> GameDataLibrary {
 
-        let mut a = GameDataLibrary {
+        let a = GameDataLibrary {
             ships: HashMap::new(),
             cargo: HashMap::new(),
             systems: HashMap::new(),
@@ -80,12 +74,11 @@ impl GameDataLibrary {
     }
 
     pub fn load_json(&mut self, file_name: &str) -> io::Result<()> {
-        let mut f = try!(File::open("data/game_library.json"));
+        let mut f = try!(File::open(file_name));
         let mut buffer = String::new();
         try!(f.read_to_string(&mut buffer));
-        println!("{}", buffer);
-        let gl: GameDataLibrary = serde_json::from_str(&buffer).unwrap();
 
+        let gl: GameDataLibrary = serde_json::from_str(&buffer).unwrap();
         for (id, ship) in &gl.ships {
             self.ships.insert(*id, ship.clone());
         }

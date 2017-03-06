@@ -8,7 +8,6 @@ mod spaceship;
 
 use spaceship::*;
 use std::io;
-use std::io::*;
 use game_data::*;
 
 enum PlayerCommand {
