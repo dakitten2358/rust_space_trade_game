@@ -1,8 +1,14 @@
+#[macro_use]
+extern crate serde_derive;
+extern crate serde_json;
+
+
 mod game_data;
 mod spaceship;
 
 use spaceship::*;
 use std::io;
+use std::io::*;
 use game_data::*;
 
 enum PlayerCommand {
@@ -12,27 +18,28 @@ enum PlayerCommand {
     UnknownAction,
 }
 
-struct PlayerSpaceship<'a, 'b> {
+struct PlayerSpaceship<'a> {
     base: &'a Spaceship,
     current_fuel: u32,
-    cargo: Vec<CargoInstance<'b>>,
+    cargo: Vec<CargoInstance>,
 }
 
-impl<'a, 'b> HasCargoSpace for PlayerSpaceship<'a, 'b> {
+impl<'a> HasCargoSpace for PlayerSpaceship<'a> {
     fn used_cargo_space(&self) -> u32 {
         self.cargo.iter().fold(0u32, |sum, x| sum + x.used_cargo_space())
     }
 }
 
-impl<'a, 'b> PlayerSpaceship<'a, 'b> {
-    pub fn add_cargo(&mut self, cargo_type: &'b CargoItem, count: u32, value: f64) {
+impl<'a> PlayerSpaceship<'a> {
+    pub fn add_cargo(&mut self, cargo_type: &CargoItem, count: u32, value: f64) {
         self.cargo.push(CargoInstance::new(cargo_type, count, value));
     }
 }
 
 fn main() {
 
-    let lib = game_data::GameDataLibrary::new();
+    let mut lib = game_data::GameDataLibrary::new();
+    lib.load_json("data/game_library.json");
 
     let mut player_ship = PlayerSpaceship {
         base: lib.get_ship(0),
