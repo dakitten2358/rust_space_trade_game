@@ -38,7 +38,10 @@ impl<'a> PlayerSpaceship<'a> {
 fn main() {
 
     let mut lib = game_data::GameDataLibrary::new();
-    lib.load_json("data/game_library.json");
+    match lib.load_json("data/game_library.json") {
+        Ok(_) => println!("data loaded.\n"),
+        Err(_) => panic!("failed to load data"),
+    }
 
     let mut player_ship = PlayerSpaceship {
         base: lib.get_ship(0),
